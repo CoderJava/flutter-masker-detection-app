@@ -26,15 +26,15 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
-  bool _loading;
-  File _image;
-  List _outputs;
+  var isLoading = false;
+  File fileImage;
+  final listOutputs = [];
 
   @override
   void initState() {
-    _loading = true;
+    isLoading = true;
     loadModel().then((value) {
-      setState(() => _loading = false);
+      setState(() => isLoading = false);
     });
     super.initState();
   }
@@ -47,9 +47,8 @@ class _HomePageState extends State<HomePage> {
           'Flutter Masker Detection',
         ),
       ),
-      body: _loading
-          ? Container(
-              alignment: Alignment.center,
+      body: isLoading
+          ? Center(
               child: CircularProgressIndicator(),
             )
           : Container(
@@ -58,18 +57,18 @@ class _HomePageState extends State<HomePage> {
                 crossAxisAlignment: CrossAxisAlignment.center,
                 mainAxisAlignment: MainAxisAlignment.center,
                 children: [
-                  _image == null ? Container() : Image.file(_image),
-                  SizedBox(height: 20),
-                  _outputs != null
-                      ? Text(
-                          '${_outputs[0]['label']}'.replaceAll(RegExp(r'[0-9]'), ''),
+                  fileImage == null ? Container() : Image.file(fileImage),
+                  SizedBox(height: 16),
+                  listOutputs == null || listOutputs.isEmpty
+                      ? Text('Upload your image')
+                      : Text(
+                          '${listOutputs[0]['label']}'.replaceAll(RegExp(r'[0-9]'), ''),
                           style: TextStyle(
                             fontSize: 20,
                             background: Paint()..color = Colors.white,
                             fontWeight: FontWeight.bold,
                           ),
-                        )
-                      : Text('Classification waiting'),
+                        ),
                 ],
               ),
             ),
@@ -101,15 +100,17 @@ class _HomePageState extends State<HomePage> {
 
   void pickImage(ImageSource imageSource) async {
     var image = await ImagePicker().getImage(source: imageSource);
-    if (image == null) return null;
+    if (image == null) {
+      return null;
+    }
     setState(() {
-      _loading = true;
-      _image = File(image.path);
+      isLoading = true;
+      fileImage = File(image.path);
     });
-    classifyImage(_image);
+    processImage(fileImage);
   }
 
-  void classifyImage(File image) async {
+  void processImage(File image) async {
     var output = await Tflite.runModelOnImage(
       path: image.path,
       numResults: 2,
@@ -118,9 +119,10 @@ class _HomePageState extends State<HomePage> {
       imageStd: 127.5,
     );
     setState(() {
-      _loading = false;
-      _outputs = output;
-      debugPrint('outputs: $_outputs');
+      isLoading = false;
+      listOutputs.clear();
+      listOutputs.addAll(output);
+      debugPrint('outputs: $listOutputs');
     });
   }
 }
