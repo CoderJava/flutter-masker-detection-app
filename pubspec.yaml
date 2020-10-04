@@ -29,6 +29,13 @@ dependencies:
   # Use with the CupertinoIcons class for iOS style icons.
   cupertino_icons: ^1.0.0
 
+  # A Flutter plugin for accessing TensorFlow Lite.
+  tflite: ^1.1.1
+
+  # Flutter plugin for selecting images from the Android and iOS image library, and
+  # taking new pictures with the camera
+  image_picker: ^0.6.7+11
+
 dev_dependencies:
   flutter_test:
     sdk: flutter
@@ -48,6 +55,8 @@ flutter:
   # assets:
   #   - images/a_dot_burr.jpeg
   #   - images/a_dot_ham.jpeg
+  assets:
+    - assets/
 
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/assets-and-images/#resolution-aware.
